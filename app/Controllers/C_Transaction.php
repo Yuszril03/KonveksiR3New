@@ -1768,7 +1768,7 @@ class C_Transaction extends BaseController
             'TypeTransaction' => 16
         ];
         $resultPaymentTrans = $this->M_ActivityTransaction->getData($wherePaymentTrans)->getResult('array');
-        $PanjangAwal = 115;
+        $PanjangAwal = 105;
         if (count($resultDetailTrans) > 1) {
             $tambahan = (5 * count($resultDetailTrans)) - 5;
             $PanjangAwal = $PanjangAwal + $tambahan;
@@ -1991,22 +1991,22 @@ class C_Transaction extends BaseController
             $y = $pdf->GetY();
             $pdf->SetLineWidth(0.1);
             $pdf->Line(5, $y - 6, 95, $y - 6);
-            // $pdf->SetX(25);
-            $pdf->Cell(18, -2, 'Bank Mandiri : 12345678 (Carudi) | Bank Mandiri : 12345678 (Carudi)', 0, 1, 'L');
-            // $pdf->Cell(2, -2, ':', 0, 0, 'L');
-            // $pdf->Cell(15, -2, '102030489 (Carudi)', 0, 0, 'L');
-            $pdf->SetX(30);
-            $pdf->Cell(20, 12, 'Bank BCA : 12345678 (Carudi) ', 0, 0, 'L');
-            // $pdf->Cell(5, 12, ':', 0, 0, 'L');
-            // $pdf->Cell(15, 12, '102030489 (Carudi)', 0, 1, 'L');
-            // $pdf->SetX(25);
-            // $pdf->Cell(20, -2, 'Bank BRI', 0, 0, 'L');
-            // $pdf->Cell(5, -2, ':', 0, 0, 'L');
-            // $pdf->Cell(15, -2, '102030489 (Carudi)', 0, 1, 'L');
+            // // $pdf->SetX(25);
+            // $pdf->Cell(18, -2, 'Bank Mandiri : 12345678 (Carudi) | Bank Mandiri : 12345678 (Carudi)', 0, 1, 'L');
+            // // $pdf->Cell(2, -2, ':', 0, 0, 'L');
+            // // $pdf->Cell(15, -2, '102030489 (Carudi)', 0, 0, 'L');
+            // $pdf->SetX(30);
+            // $pdf->Cell(20, 12, 'Bank BCA : 12345678 (Carudi) ', 0, 0, 'L');
+            // // $pdf->Cell(5, 12, ':', 0, 0, 'L');
+            // // $pdf->Cell(15, 12, '102030489 (Carudi)', 0, 1, 'L');
+            // // $pdf->SetX(25);
+            // // $pdf->Cell(20, -2, 'Bank BRI', 0, 0, 'L');
+            // // $pdf->Cell(5, -2, ':', 0, 0, 'L');
+            // // $pdf->Cell(15, -2, '102030489 (Carudi)', 0, 1, 'L');
 
-            $y = $pdf->GetY();
-            $pdf->SetLineWidth(0.1);
-            $pdf->Line(5, $y + 10, 95, $y + 10);
+            // $y = $pdf->GetY();
+            // $pdf->SetLineWidth(0.1);
+            // $pdf->Line(5, $y + 10, 95, $y + 10);
 
 
             $this->response->setHeader('Content-Type', 'application/pdf');
