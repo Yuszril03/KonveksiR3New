@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "generate-unique-username": "^1.1.0"
+  }
+}

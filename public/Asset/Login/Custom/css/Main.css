@@ -1,0 +1,18 @@
+@media only screen and (min-device-width: 1024px) {
+    .FullName {
+        display: block;
+    }
+     .ShortName {
+        display: none;
+    }
+}
+
+@media only screen and (max-width: 360px),
+(min-device-width: 360px) and (max-device-width: 1024px) {
+     .FullName {
+        display: none;
+    }
+     .ShortName {
+        display: block;
+    }
+}

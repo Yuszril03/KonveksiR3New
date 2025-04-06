@@ -1,0 +1,29 @@
+.iti {
+    width: 100% !important;
+}
+.list-menu-custom{
+    width: 100%;
+    background-color: #e5e5e5;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    font-weight: bold;
+}
+.btn-custom{
+   --bs-btn-padding-x: 0rem;
+   --bs-btn-padding-y: 0rem;
+   margin-right: 5px;
+}
+
+html[data-bs-theme="dark"] .list-menu-custom{
+    width: 100%;
+    background-color: #2d2d43;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    
+}
+
+html[data-bs-theme="dark"] .btn-custom{
+   --bs-btn-padding-x: 0rem;
+   --bs-btn-padding-y: 0rem;
+   margin-right: 5px;
+}

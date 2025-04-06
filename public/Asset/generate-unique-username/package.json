@@ -1,0 +1,25 @@
+{
+  "name": "generate-unique-username",
+  "version": "1.1.0",
+  "description": "This repository provide you an option to generate unique usernames",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AmanSultanBaig/generate-unique-username"
+  },
+  "keywords": [
+    "username",
+    "unique_username",
+    "username_generator",
+    "random_username_generator",
+    "random_name_generator"
+  ],
+  "scripts": {
+    "start": "nodemon index"
+  },
+  "author": "Aman Sultan Baig",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^2.0.22"
+  }
+}

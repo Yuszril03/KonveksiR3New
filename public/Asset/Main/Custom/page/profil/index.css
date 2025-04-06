@@ -1,0 +1,144 @@
+.iti {
+width: 100% !important;
+}
+.list-menu-custom{
+width: 100%;
+background-color: #e5e5e5;
+margin-bottom: 10px;
+border-radius: 10px;
+font-weight: bold;
+}
+.btn-custom{
+--bs-btn-padding-x: 0rem;
+--bs-btn-padding-y: 0rem;
+margin-right: 5px;
+}
+
+html[data-bs-theme="dark"] .list-menu-custom{
+width: 100%;
+background-color: #2d2d43;
+margin-bottom: 10px;
+border-radius: 10px;
+
+}
+
+html[data-bs-theme="dark"] .btn-custom{
+--bs-btn-padding-x: 0rem;
+--bs-btn-padding-y: 0rem;
+margin-right: 5px;
+}
+
+.bg-profil {
+height: 200px;
+background-color: #738bdc;
+background-image: linear-gradient(315deg, #738bdc 0%, #48c3eb 74%);
+border-radius: 10px;
+}
+
+.img-profil {
+width: 100px;
+}
+
+.img-profil2 {
+width: 100px;
+margin-left: -121px;
+opacity: 0;
+}
+
+.custom-position-name {
+margin-top: -40px;
+}
+
+.custom-position-image {
+margin-top: -22px;
+}
+
+.custom-name {
+color: white;
+}
+
+.custom-judul {
+color: #435ebe;
+}
+
+html[data-bs-theme="dark"] .custom-judul {
+color: white;
+}
+
+.img-profil2:hover {
+opacity: 0.3;
+}
+
+.custom-desc-sub {
+margin-top: -12px;
+font-weight: bold;
+}
+html[data-bs-theme="dark"] .custom-desc-sub {
+margin-top: -12px;
+font-weight: bold;
+}
+
+@media only screen and (min-device-width: 1024px) {
+.custom-name {
+font-size: 20pt;
+font-weight: bold;
+}
+
+
+}
+
+@media only screen and (max-width: 360px),
+(min-device-width: 360px) and (max-device-width: 1024px) {
+.custom-name {
+font-size: 12pt;
+font-weight: bold;
+}
+
+.custom-position-name {
+width: 160px;
+}
+}
+
+.custom-address{
+    margin-left: 0.9rem;
+}
+
+
+.vertical-center {
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+    margin-left: 5px;
+}
+
+.file-upload {
+    height: max-content;
+    border: 2px dotted gray;
+    border-radius: 15px;
+    margin-bottom: 10px;
+}
+
+.Imagees {
+    min-height: 100px;
+    width: 50%;
+    margin: auto;
+    object-fit: cover;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.Imagees img {
+    width: 100%;
+}
+
+.file-upload-input {
+    opacity: 0;
+    height: 100px;
+}
+
+.img-thumbnail{
+    width: 120px !important;
+    height: 120px !important;
+}

@@ -1,0 +1,44 @@
+  .custom-date {
+            /* font-size: 16px; */
+            margin-bottom: 0px !important;
+        }
+
+        .customLeghty {
+            background-color: blue;
+            width: 5px;
+            border-radius: 10px;
+        }
+
+        .custom-padding {
+            padding: 8px;
+        }
+
+        .custom-contain-item {
+            border-radius: 20px;
+            border: 1px solid #e8e8e8;
+        }
+
+        html[data-bs-theme="dark"] .custom-contain-item {
+            border-radius: 20px;
+            border: 1.3px solid #151521;
+        }
+
+        @media only screen and (min-device-width: 1024px) {
+            .flex-custom {
+                flex-direction: row !important;
+            }
+            .imgEmpty{
+                width: 200px;
+            }
+
+        }
+
+        @media only screen and (max-width: 360px),
+        (min-device-width: 360px) and (max-device-width: 1024px) {
+            .flex-custom {
+                flex-direction: column !important;
+            }
+            .imgEmpty{
+                width: 150px;
+            }
+        }
