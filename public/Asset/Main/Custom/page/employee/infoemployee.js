@@ -133,7 +133,7 @@ function setData () {
     let Karyawan = result.Karyawan
     let Log = result.Log
     let Bawahan = result.Bawahan
-    // console.log(result)
+    console.log(result)
 
     //set EMploye
     document.getElementById('nameEmploye').innerHTML = Karyawan.Name

@@ -85,6 +85,7 @@ class C_Employee extends BaseController
 
         // 2. Get Data Log
         $EndDate = date('Y-m-d');
+        $EndDate = date('Y-m-d', strtotime($EndDate . ' +1 day'));
         $StartDate = date('Y-m-d', strtotime($EndDate . ' -8 day'));
         $whereDataLog = "Username = '" . $resultDataUser->Username . "' AND CreatedDate >= '" . $StartDate . "' AND CreatedDate <= '" . $EndDate . "'";
         $resultLog = $this->M_ActivityEmployee->getDataLog($whereDataLog, 'DESC')->getResult('array');
