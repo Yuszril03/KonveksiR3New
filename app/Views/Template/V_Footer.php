@@ -5,7 +5,7 @@
                 <p>2023 &copy; Koveksi R3</p>
             </div>
             <div class="float-end">
-                <p>Support by <a href="https://saugi.me">Achmad Yuszril Oiszy</a></p>
+                <p>Support by <a href="https://www.instagram.com/yuszril03?igsh=ZWJqcmRpeDF2ZTU1">Achmad Yuszril Oiszy</a></p>
             </div>
         </div>
     </div>
