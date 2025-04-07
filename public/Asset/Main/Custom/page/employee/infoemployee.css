@@ -9,12 +9,12 @@
             border-radius: 10px;
         }
         .scroll-log{
-            overflow:scroll; 
+            overflow-y:scroll; 
             max-height:180px;
             min-height:135px; 
         }
         .scroll-price{
-            overflow:scroll; 
+            overflow-y:scroll; 
             max-height:325px;
             min-height:135px; 
         }
@@ -101,7 +101,7 @@
         .scroll-karyawan-saya{
             max-height:160px;
             min-height:135px;
-             overflow:scroll; 
+             overflow-y:scroll; 
         }
         .value-subtitle{
             margin-bottom: 16px;

@@ -91,12 +91,11 @@ class C_Employee extends BaseController
 
         // 3. Get Bawahan
         $resultDataBawahan = array();
-        $whereDataBAwahan = "1=1";
+        // $whereDataBAwahan = "1=1";
+        $whereDataBAwahan = " Superior = '" . $resultDataUser->Username . "'";
         if ((int)$resultDataUser->IdPosition == 1) {
-            $whereDataBAwahan = $whereDataBAwahan . " AND IdPosition <> 1";
-        } else if ((int)$resultDataUser->IdPosition == 3) {
-            $whereDataBAwahan = $whereDataBAwahan .  " AND Superior = '" . $resultDataUser->Username . "'";
-        }
+            $whereDataBAwahan = "1=1 AND Username <> '".$resultDataUser->Username."'";
+        } 
 
         $resultDataBawahan = $this->M_Employee->getData($whereDataBAwahan)->getResult('array');
 
