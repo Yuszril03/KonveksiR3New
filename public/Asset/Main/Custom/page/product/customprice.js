@@ -117,7 +117,7 @@ function setDataProduct () {
     data: dataQuery,
     dataType: 'JSON'
   }).done(result => {
-    console.log(result)
+    // console.log(result)
     document.getElementById('NameProduct').innerHTML = result.Name
     document.getElementById('sizeProduk').innerHTML = result.Size
     document.getElementById('type').innerHTML = result.Jenis
@@ -324,9 +324,11 @@ function setDataCustomFrom (id) {
   }).done(result => {
     document.getElementById('Name').value = result.Name
     document.getElementById('tempName').value = result.Name
-    document.getElementById('Potong').value = formatRupiah(result.Per_Piece)
-    document.getElementById('Lusin').value = formatRupiah(result.Per_Dozen)
-    document.getElementById('Kodi').value = formatRupiah(result.Per_Kodi)
+    document.getElementById('Potong').value = formatRupiah(
+      result.Per_Piece + ''
+    )
+    document.getElementById('Lusin').value = formatRupiah(result.Per_Dozen + '')
+    document.getElementById('Kodi').value = formatRupiah(result.Per_Kodi + '')
     formdata = 0
     modalAdd.show()
   })

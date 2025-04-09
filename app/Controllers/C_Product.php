@@ -584,16 +584,21 @@ class C_Product extends BaseController
     }
     public function getOneCustomPrice($id)
     {
-        $result = $this->M_CustomerPriceProduct->getData($this->request->getVar('query'))->getResult('array');
-        if (count($result) > 0) {
-            echo json_encode([]);
-        } else {
-            $whereGetPrice = [
-                'm_price_product.Id' => $result[0]->Id_Price_Product
-            ];
+        // $result = $this->M_CustomerPriceProduct->getData($this->request->getVar('query'))->getResult('array');
+        // if (count($result) > 0) {
+        //     echo json_encode([]);
+        // } else {
+        //     $whereGetPrice = [
+        //         'm_price_product.Id' => $result[0]->Id_Price_Product
+        //     ];
 
-            echo json_encode($this->M_PriceProduct->getData($whereGetPrice)->getResult('array'));
-        }
+        //     echo json_encode($this->M_PriceProduct->getData($whereGetPrice)->getResult('array'));
+        // }
+        $whereGetPrice = [
+            'm_price_product.Id' => $id
+        ];
+
+        echo json_encode($this->M_PriceProduct->getData($whereGetPrice)->getRow());
     }
     public function UpdateCustomPrice()
     {
