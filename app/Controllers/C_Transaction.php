@@ -1751,6 +1751,93 @@ class C_Transaction extends BaseController
         echo json_encode($data);
     }
 
+    public function setCartDraftPrint($whereID)
+    {
+        $resultData = $this->T_DetailTransactionManual->getData($whereID)->getResult('array');
+        $data = $resultData;
+        // $data = array();
+        $totalSemua = 0;
+        $totalHutang = 0;
+        $jumlahTundaProduk = 0;
+        $whereProdukAll = [
+            'Status' => 1
+        ];
+        $resultPRodukAll = $this->M_Product->getData($whereProdukAll)->getResult('array');
+
+        for ($i = 0; $i < count($resultData); $i++) {
+            $whereProduk = [
+                'm_product.Id' => $resultData[$i]['Id_Product']
+            ];
+            $whereTrans = [
+                'Id' => $resultData[$i]['Id_Transaction']
+            ];
+
+            $resultTransaction = $this->T_TransaksiManual->getData($whereTrans)->getRow();
+            $totalHutang = $resultTransaction->Total_Dept;
+            $resultProduk = $this->M_Product->getDataJoin($whereProduk)->getRow();
+            $resultKhususProduk = $this->M_Product->getDataJoin($whereProduk)->getRow();
+            $harga = 0;
+            $piece = 1;
+            $status = 8;
+
+            for ($j = 0; $j < count($resultPRodukAll); $j++) {
+                if ($resultProduk->Id == $resultPRodukAll[$j]['Id']) {
+
+                    if ($resultPRodukAll[$j]['Stock_Piece'] >= $resultData[$i]['Sum_Product_PerPiece']) {
+                        $temp2 = $resultPRodukAll[$j]['Stock_Piece'] - $resultData[$i]['Sum_Product_PerPiece'];
+                        $resultPRodukAll[$j]['Stock_Piece'] = $temp2;
+                        $status = 7;
+                    } else {
+                        $jumlahTundaProduk++;
+                    }
+                }
+            }
+
+            // if ($resultProduk->Stock_Piece >= $resultData[$i]['Sum_Product_PerPiece']) {
+            //     $status = 7;
+            // }
+
+            $wherePriceKhusus = [
+                'm_customer_price_product.Id_Product' => $resultData[$i]['Id_Product'],
+                'm_customer_price_product.Id_Customer' =>  $resultTransaction->IdCustomer,
+                'pp.Status' =>  '1'
+            ];
+            $resultKhususProduk = $this->M_CustomerPriceProduct->getDataPriceTrans($wherePriceKhusus)->getRow();
+            if ($resultKhususProduk == null) {
+                if ($resultData[$i]['Unit_Product'] == 'Potong') {
+                    $harga = $resultProduk->Per_Piece;
+                    $piece = $resultData[$i]['Sum_Product_PerPiece'];
+                } else  if ($resultData[$i]['Unit_Product'] == 'Lusin') {
+                    $harga = $resultProduk->Per_Doze;
+                    $piece =  $resultData[$i]['Sum_Product_PerPiece'] /  12;
+                } else  if ($resultData[$i]['Unit_Product'] == 'Kodi') {
+                    $harga = $resultProduk->Per_Kodi;
+                    $piece =  $resultData[$i]['Sum_Product_PerPiece'] / 20;
+                }
+            } else {
+                if ($resultData[$i]['Unit_Product'] == 'Potong') {
+                    $harga = $resultKhususProduk->Potong;
+                    $piece = $resultData[$i]['Sum_Product_PerPiece'];
+                } else  if ($resultData[$i]['Unit_Product'] == 'Lusin') {
+                    $harga = $resultKhususProduk->Lusin;
+                    $piece = $resultData[$i]['Sum_Product_PerPiece'] / 12;
+                } else  if ($resultData[$i]['Unit_Product'] == 'Kodi') {
+                    $harga = $resultKhususProduk->Kodi;
+                    $piece =  $resultData[$i]['Sum_Product_PerPiece'] / 20;
+                }
+            }
+
+
+            $total = $harga * $piece;
+            $totalSemua = $totalSemua + $total;
+            $data[$i]['Name_Product'] = $resultProduk->Name;
+            $data[$i]['Size_Product'] = $resultProduk->Size;
+            $data[$i]['Price_Product'] = $harga;
+            $data[$i]['Total_Payment'] = $total;
+        }
+        return $data;
+    }
+
     public function PrintNota($trans)
     {
         $whereTrans = [
@@ -1768,24 +1855,48 @@ class C_Transaction extends BaseController
             'TypeTransaction' => 16
         ];
         $resultPaymentTrans = $this->M_ActivityTransaction->getData($wherePaymentTrans)->getResult('array');
-        $PanjangAwal = 105;
-        if (count($resultDetailTrans) > 1) {
-            $tambahan = (5 * count($resultDetailTrans)) - 5;
-            $PanjangAwal = $PanjangAwal + $tambahan;
-        }
-        if (count($resultPaymentTrans) > 1) {
-            $tambahan = (4 * count($resultPaymentTrans)) - 4;
-            $PanjangAwal = $PanjangAwal + $tambahan;
-        }
 
-        if ($resultTrans->StatusTransakksi == 1 || $resultTrans->StatusTransakksi == 2 || $resultTrans->StatusTransakksi == 3) {
+
+        if ($resultTrans->StatusTransakksi == 1  || $resultTrans->StatusTransakksi == 3) {
             $setData = [
                 'ErrorText' => 'Transaksi Tidak Dapat Mencetak Nota'
             ];
             session()->set($setData);
             return  redirect()->to(base_url('/Error'));
         } else {
+            if ($resultTrans->StatusTransakksi == 2) {
+                $resultDetailTrans = $this->setCartDraftPrint($whereDetailTrans);
+            }
 
+            $countLenghtTExt = 0;
+            $totalPanjanglengTExt = 0;
+            foreach ($resultDetailTrans as $row) {
+                $textProduct = $row['Name_Product'] . '(' . $row['Size_Product'] . ')';
+                if (strlen($textProduct) > 21) {
+                    $countLenghtTExt = $countLenghtTExt + 1;
+                    $totalPanjanglengTExt =  $totalPanjanglengTExt + 1;
+                }
+            }
+            $PanjangAwal = 103;
+            if ($countLenghtTExt > 0) {
+                $PanjangAwal = 105;
+            }
+            if ($resultTrans->StatusTransakksi == 2) {
+                $PanjangAwal = 95;
+            }
+            if ($countLenghtTExt > 0) {
+                $tambahan = ($totalPanjanglengTExt * count($resultDetailTrans)) - $totalPanjanglengTExt;
+                $PanjangAwal = $PanjangAwal + $tambahan;
+            }
+
+            if (count($resultDetailTrans) > 1) {
+                $tambahan = (5 * count($resultDetailTrans)) - 5;
+                $PanjangAwal = $PanjangAwal + $tambahan;
+            }
+            if (count($resultPaymentTrans) > 1) {
+                $tambahan = (4 * count($resultPaymentTrans)) - 4;
+                $PanjangAwal = $PanjangAwal + $tambahan;
+            }
 
 
             $pdf = new\FPDF('P', 'mm', array(100, $PanjangAwal));
@@ -1817,117 +1928,88 @@ class C_Transaction extends BaseController
             //Value
             $pdf->Cell(10, 8, '', 0, 1);
             $enterName = 0;
+            $subTotalDraft = 0;
+            $lengtext = 0;
             foreach ($resultDetailTrans as $row) {
-                // for ($i = 0; $i < 1; $i++) {
+
                 $x = $pdf->GetX();
                 $y = $pdf->GetY();
-                if ($y >= 184.00125) {
-                    $y = 20.00125;
-                    $col1 = 1;
-
-                    $pdf->SetXY($x + 10, $y);
-
-                    // $temapungNamaTemp = $namaProduk = $rows['namaProduk'] . "( " . $rows['id_ukuran'] . " )";
-                    // $temapungNama = $namaProduk = $rows['namaProduk'];
-                    // $tampungUkuran = "( " . $rows['id_ukuran'] . " )";
-                    // $ukuranAsli = (30 - strlen($tampungUkuran)) - 3;
-                    // $namaProduk = "";
-                    // if (strlen($temapungNamaTemp) >= 30) {
-                    //     $rem = [];
-                    //     for ($r = 0; $r < $ukuranAsli; $r++) {
-                    //         $rem[$r] =  $temapungNama[$r];
-                    //     }
-                    //     $namaProduk = implode($rem) . "..." . $tampungUkuran;
-                    // } else {
-
-                    //     $namaProduk = $rows['namaProduk'] . " ( " . $rows['id_ukuran'] . " )";
-                    // }
-                    // $pdf->MultiCell(45, 5, $namaProduk, 0);
-                    $pdf->MultiCell(45, 5, "Nama Produk", 0);
-                    $pdf->SetXY($x + 55, $y);
-                    $JumlahQTY = "1 KD";
-                    // if ($rows['SatuanProduk'] == "UK" || $rows['SatuanProduk'] == "KK") {
-                    //     $JumlahQTY = ($rows['jumlahProduk'] / 20) . "(K)";
-                    // } else  if ($rows['SatuanProduk'] == "UL" || $rows['SatuanProduk'] == "KL") {
-                    //     $JumlahQTY = ($rows['jumlahProduk'] / 12) . " (L)";
-                    // } else  if ($rows['SatuanProduk'] == "UP" || $rows['SatuanProduk'] == "KP") {
-                    //     $JumlahQTY = ($rows['jumlahProduk']) . " (P)";
-                    // }
-                    $pdf->MultiCell(15, 5, $JumlahQTY, 0, "C");
-                    $pdf->SetXY($x + 70, $y);
-                    $pdf->MultiCell(40, 5, "Rp. ", 0, "C");
-                    $pdf->SetXY($x + 105, $y);
-                    $pdf->MultiCell(0, 5, "Rp. ", 0, "C");
-                    $pdf->Ln(0);
-                } else {
-                    if ($enterName == 1) {
-                        $y = $y + 5;
-                    }
-                    $pdf->SetXY($x, $y);
-
-                    // $temapungNamaTemp = $namaProduk = $rows['namaProduk'] . "( " . $rows['id_ukuran'] . " )";
-                    // $temapungNama = $namaProduk = $rows['namaProduk'];
-                    // $tampungUkuran = "( " . $rows['id_ukuran'] . " )";
-                    // $ukuranAsli = (30 - strlen($tampungUkuran)) - 3;
-                    // $namaProduk = "";
-                    // if (strlen($temapungNamaTemp) >= 30) {
-                    //     $rem = [];
-                    //     for ($r = 0; $r < $ukuranAsli; $r++) {
-                    //         $rem[$r] =  $temapungNama[$r];
-                    //     }
-                    //     $namaProduk = implode($rem) . "..." . $tampungUkuran;
-                    // } else {
-
-                    //     $namaProduk = $rows['namaProduk'] . " ( " . $rows['id_ukuran'] . " )";
-                    // }
-                    // $pdf->MultiCell(45, 5, $namaProduk, 0);
-                    $pdf->MultiCell(35, 5, $row['Name_Product'] . '(' . $row['Size_Product'] . ')', 0);
-                    $pdf->SetXY($x + 32, $y);
-                    $JumlahQTY = "";
-                    if ($row['Unit_Product'] == "Potong") {
-                        $JumlahQTY = ($row['Sum_Product_PerPiece'] / 1) . "PT";
-                    } else  if ($row['Unit_Product'] == "Lusin") {
-                        $JumlahQTY = ($row['Sum_Product_PerPiece'] / 12) . "LSN";
-                    } else  if ($row['Unit_Product'] == "Kodi") {
-                        $JumlahQTY = ($row['Sum_Product_PerPiece'] / 20) . "KD";
-                    }
-                    $pdf->MultiCell(15, 5, $JumlahQTY, 0, "L");
-                    $pdf->SetXY($x + 43, $y);
-                    $pdf->MultiCell(25, 5, number_format($row['Price_Product'], 0, ",", "."), 0, "L");
-                    $pdf->SetXY($x + 65, $y);
-                    $pdf->MultiCell(0, 5, number_format($row['Total_Payment'], 0, ",", "."), 0, "L");
-                    // $enterName = 1;
-                    $pdf->Ln(0);
+                if ($enterName == 1) {
+                    $y = $y + 5;
                 }
-            }
 
+                if ($lengtext > 21) {
+                    $y = $y + 5;
+                }
+                $pdf->SetXY($x, $y);
+
+
+                $textProduct = $row['Name_Product'] . '(' . $row['Size_Product'] . ')';
+                $pdf->MultiCell(35, 5, $textProduct, 0, 'L');
+                $lengtext = strlen($textProduct);
+                $pdf->SetXY($x + 32, $y);
+                $JumlahQTY = "";
+                if ($row['Unit_Product'] == "Potong") {
+                    $JumlahQTY = ($row['Sum_Product_PerPiece'] / 1) . "PT";
+                } else  if ($row['Unit_Product'] == "Lusin") {
+                    $JumlahQTY = ($row['Sum_Product_PerPiece'] / 12) . "LSN";
+                } else  if ($row['Unit_Product'] == "Kodi") {
+                    $JumlahQTY = ($row['Sum_Product_PerPiece'] / 20) . "KD";
+                }
+                $pdf->MultiCell(15, 5, $JumlahQTY, 0, "L");
+                $pdf->SetXY($x + 43, $y);
+                $pdf->MultiCell(25, 5, number_format($row['Price_Product'], 0, ",", "."), 0, "L");
+                $pdf->SetXY($x + 65, $y);
+                $pdf->MultiCell(0, 5, number_format($row['Total_Payment'], 0, ",", "."), 0, "L");
+                $subTotalDraft = $subTotalDraft + $row['Total_Payment'];
+                // $enterName = 1;
+                $pdf->Ln(0);
+            }
+            if ($resultTrans->StatusTransakksi == 2) {
+                $resultTrans->Sub_Total = $subTotalDraft;
+                $resultTrans->Total_Payment = $subTotalDraft + $resultTrans->Total_Dept;
+            }
             $y = $pdf->GetY();
+            $spacesub = 0;
+            if ($countLenghtTExt > 0) {
+                $y = $pdf->GetY() + 3;
+                $spacesub = 7;
+            }
             $pdf->SetLineWidth(0.1);
             $pdf->Line(45, $y + 3, 95, $y + 3);
             $y = $pdf->GetY();
 
             $pdf->SetTextColor(0, 0, 0);
             $pdf->SetFont('Arial', '', 8);
-            $pdf->Cell(52, 13, "Subtotal", 0, 0, "R");
-            $pdf->Cell(13, 13, ":", 0, 0, "C");
-            $pdf->Cell(0, 13, number_format($resultTrans->Sub_Total, 0, ",", "."), 0, 1, "L");
+            $pdf->Cell(52, 13 + $spacesub, "Subtotal", 0, 0, "R");
+            $pdf->Cell(13, 13 + $spacesub, ":", 0, 0, "C");
+            $pdf->Cell(0, 13 + $spacesub, number_format($resultTrans->Sub_Total, 0, ",", "."), 0, 1, "L");
 
-            $pdf->Cell(52, -5, "Hutang", 0, 0, "R");
-            $pdf->Cell(13, -5, ":", 0, 0, "C");
-            $pdf->Cell(0, -5, number_format($resultTrans->Total_Dept, 0, ",", "."), 0, 1, "L");
+            $pdf->Cell(52, -5 - $spacesub, "Hutang", 0, 0, "R");
+            $pdf->Cell(13, -5 - $spacesub, ":", 0, 0, "C");
+            $pdf->Cell(0, -5 - $spacesub, number_format($resultTrans->Total_Dept, 0, ",", "."), 0, 1, "L");
 
             $y = $pdf->GetY();
+            if ($countLenghtTExt > 0) {
+                $y = $pdf->GetY() + 3;
+                $spacesub = 7;
+            }
             $pdf->SetLineWidth(0.1);
             $pdf->Line(45, $y + 6, 95, $y + 6);
             $y = $pdf->GetY();
 
-            $pdf->Cell(52, 18, "Total", 0, 0, "R");
-            $pdf->Cell(13, 18, ":", 0, 0, "C");
-            $pdf->Cell(0, 18, number_format($resultTrans->Total_Payment, 0, ",", "."), 0, 1, "L");
+            $pdf->Cell(52, 18 + $spacesub, "Total", 0, 0, "R");
+            $pdf->Cell(13, 18 + $spacesub, ":", 0, 0, "C");
+            $pdf->Cell(0, 18 + $spacesub, number_format($resultTrans->Total_Payment, 0, ",", "."), 0, 1, "L");
 
 
 
-            $pdf->Cell(10, -7, '', 0, 1);
+
+            if ($countLenghtTExt > 0) {
+                $pdf->Cell(10, -3 - $spacesub, '', 0, 1);
+            } else {
+                $pdf->Cell(10, -7, '', 0, 1);
+            }
             $urutanBayar = 1;
             $sisaPayment = 0;
             $kembaliPayment = 0;
@@ -1972,9 +2054,13 @@ class C_Transaction extends BaseController
                 $hasilKembalianorsisa = $sisaPayment;
                 $Status = 'Diteruskan';
             }
-            $pdf->Cell(52, 5, $textKembalian, 0, 0, "R");
-            $pdf->Cell(13, 5, ":", 0, 0, "C");
-            $pdf->Cell(0, 5, number_format($hasilKembalianorsisa, 0, ",", "."), 0, 1, "L");
+
+            if ($resultTrans->StatusTransakksi != 2) {
+                $pdf->Cell(52, 5, $textKembalian, 0, 0, "R");
+                $pdf->Cell(13, 5, ":", 0, 0, "C");
+                $pdf->Cell(0, 5, number_format($hasilKembalianorsisa, 0, ",", "."), 0, 1, "L");
+            }
+
 
 
 
