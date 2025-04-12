@@ -40,11 +40,11 @@ class T_DetailTransactionManual extends Model
         if ($data == false) {
             // $hasil = $this->join('jenisproduk', 'produk.jenisProduk = jenisproduk.idJenisProduk')
             //     ->join('bahan', 'produk.jenisBahan = bahan.idBahan');
-            return $this->findAll();
+            return $this->orderBy('CreatedDate','ASC')->findAll();
         }
 
         $hasil = $this->where($data);
-        return $hasil->get();
+        return $hasil->orderBy('CreatedDate','ASC')->get();
     }
 
 
