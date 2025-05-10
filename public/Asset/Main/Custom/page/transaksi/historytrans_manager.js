@@ -211,8 +211,11 @@ function setList (pages, total) {
           <button Title="Detail Transaksi" data-id="${data[i]['Number_Trans']}" class='btn btn-primary btn-sm mt-lg-3 mt-3 details'>
             <i class='bi bi-eye'></i>
           </button>
-           <a Title="Cetak Nota" href="${linkUrl}/Nota-Transaksi/${data[i]['Number_Trans']}" target="_blank" class='btn btn-secondary btn-sm mt-lg-3 mt-3'>
+          <button data-id="${data[i]['Number_Trans']}" Title="Cetak Nota"  class='btn btn-secondary btn-sm mt-lg-3 mt-3 cetak'>
             <i class='bi bi-receipt'></i>
+          </button>
+           <a Title="Download Nota" href="${linkUrl}/Nota-Transaksi/${data[i]['Number_Trans']}" target="_blank" class='btn btn-danger btn-sm mt-lg-3 mt-3'>
+            <i class="bi bi-cloud-arrow-down-fill"></i>
           </a>`
       } else if (data[i]['StatusTransakksi'] == 3) {
         status = `<span class="badge text-bg-danger">Batal</span>`
@@ -224,17 +227,25 @@ function setList (pages, total) {
         button = `<button Title="Detail Transaksi" data-id="${data[i]['Number_Trans']}" class='btn btn-primary btn-sm mt-lg-3 mt-3 details'>
             <i class='bi bi-eye'></i>
           </button>
-          <a Title="Cetak Nota" href="${linkUrl}/Nota-Transaksi/${data[i]['Number_Trans']}" target="_blank" class='btn btn-secondary btn-sm mt-lg-3 mt-3'>
+         <button data-id="${data[i]['Number_Trans']}" Title="Cetak Nota"  class='btn btn-secondary btn-sm mt-lg-3 mt-3 cetak'>
             <i class='bi bi-receipt'></i>
-          </a>`
+          </button>
+          <a Title="Download Nota" href="${linkUrl}/Nota-Transaksi/${data[i]['Number_Trans']}" target="_blank" class='btn btn-danger btn-sm mt-lg-3 mt-3'>
+            <i class="bi bi-cloud-arrow-down-fill"></i>
+          </a>
+          `
       } else if (data[i]['StatusTransakksi'] == 5) {
         status = `<span class="badge text-bg-warning">Hutang</span>`
         button = `<button Title="Detail Transaksi" data-id="${data[i]['Number_Trans']}" class='btn btn-primary btn-sm mt-lg-3 mt-3 details'>
             <i class='bi bi-eye'></i>
           </button>
-          <a Title="Cetak Nota" href="${linkUrl}/Nota-Transaksi/${data[i]['Number_Trans']}" target="_blank" class='btn btn-secondary btn-sm mt-lg-3 mt-3'>
+          <button data-id="${data[i]['Number_Trans']}" Title="Cetak Nota"  class='btn btn-secondary btn-sm mt-lg-3 mt-3 cetak'>
             <i class='bi bi-receipt'></i>
-          </a>`
+          </button>
+          <a Title="Download Nota" href="${linkUrl}/Nota-Transaksi/${data[i]['Number_Trans']}" target="_blank" class='btn btn-danger btn-sm mt-lg-3 mt-3'>
+            <i class="bi bi-cloud-arrow-down-fill"></i>
+          </a>
+          `
       }
 
       values += `
@@ -624,6 +635,14 @@ $(document).on('click', '.details', function () {
   let id = $(this).data('id')
   window.location.href = linkUrl + 'Detail-Transaksi/' + id
 })
+$(document).on('click', '.cetak', function () {
+  let id = $(this).data('id')
+  $.ajax({
+    url: linkUrl + 'C_Transaction/printCetakNow/' + id,
+    method: 'GET'
+  })
+})
+
 $(document).on('click', '.edits', function () {
   let id = $(this).data('id')
   window.location.href = linkUrl + 'Edit-Transaksi/' + id

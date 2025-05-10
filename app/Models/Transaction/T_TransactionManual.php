@@ -36,11 +36,11 @@ class T_TransactionManual extends Model
         if ($data == false) {
             // $hasil = $this->join('jenisproduk', 'produk.jenisProduk = jenisproduk.idJenisProduk')
             //     ->join('bahan', 'produk.jenisBahan = bahan.idBahan');
-            return $this->findAll();
+            return $this->orderBy('CreatedDate', 'ASC')->findAll();
         }
 
         $hasil = $this->where($data);
-        return $hasil->get();
+        return $hasil->orderBy('CreatedDate', 'ASC')->get();
     }
     public function getDataJoin($data = false)
     {
@@ -64,14 +64,14 @@ class T_TransactionManual extends Model
     {
         if ($data == false) {
             $hasil = $this->select('t_transaction_manual.Id, t_transaction_manual.Number_Trans, t_transaction_manual.CreatedDate,
-                m_customer.Name as NamaCustomer, m_employee.Name as NamaKasir, Sub_Total, Payment, Total_Dept, Total_Payment,t_transaction_manual.Status as StatusTransakksi,
+                m_customer.Name as NamaCustomer,m_employee.Id as usernamekasir, m_employee.Name as NamaKasir, Sub_Total, Payment, Total_Dept, Total_Payment,t_transaction_manual.Status as StatusTransakksi,
                 t_transaction_manual.IdCustomer')
                 ->join('m_customer', 't_transaction_manual.IdCustomer = m_customer.Id')
                 ->join('m_employee', 't_transaction_manual.Username_Employee = m_employee.Username');
             return $hasil->orderBy('Number_Trans', $sort)->findAll();
         }
         $hasil = $this->select('t_transaction_manual.Id, t_transaction_manual.Number_Trans, t_transaction_manual.CreatedDate,
-                m_customer.Name as NamaCustomer, m_employee.Name as NamaKasir, Sub_Total, Payment, Total_Dept, Total_Payment,t_transaction_manual.Status as StatusTransakksi,
+                m_customer.Name as NamaCustomer,m_employee.Id as usernamekasir , m_employee.Name as NamaKasir, Sub_Total, Payment, Total_Dept, Total_Payment,t_transaction_manual.Status as StatusTransakksi,
                 t_transaction_manual.IdCustomer')
             ->join('m_customer', 't_transaction_manual.IdCustomer = m_customer.Id')
             ->join('m_employee', 't_transaction_manual.Username_Employee = m_employee.Username');

@@ -163,7 +163,7 @@
                                         <img style="width: 220px;" src="<?= base_url() ?>/Asset/Icon/offline.svg" alt="">
                                         <p>Tidak ada karyawan aktif</p>
                                     </div>
-                                    <div id="onlineUser" class="d-none" style="overflow-y:scroll; height:235px;">
+                                    <div id="onlineUser" class="d-none" style="overflow:scroll; height:235px;">
 
                                     </div>
 

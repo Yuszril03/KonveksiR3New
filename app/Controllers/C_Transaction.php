@@ -16,8 +16,18 @@ use App\Models\Transaction\T_DetailTransactionManual;
 use App\Models\Transaction\T_TransactionManual;
 use CodeIgniter\HTTP\Header;
 use CodeIgniter\HTTP\Request;
+use Mike42\Escpos\CapabilityProfile;
+use Mike42\Escpos\ImagickEscposImage;
+use Mike42\Escpos\PrintConnectors\WindowsPrintConnector;
+use Mike42\Escpos\Printer;
+// use Mike42\Escpos\PrintConnectors\WindowsPrintConnector;
+// use Mike42\Escpos\Printer;
+// use Mike42\Escpos\CapabilityProfile;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+// use Mike42\Escpos\PrintConnectors\WindowsPrintConnector;
+// use Mike42\Escpos\CapabilityProfile;
+// use Mike42\Escpos\Printer;
 
 class C_Transaction extends BaseController
 {
@@ -1872,12 +1882,12 @@ class C_Transaction extends BaseController
             $totalPanjanglengTExt = 0;
             foreach ($resultDetailTrans as $row) {
                 $textProduct = $row['Name_Product'] . '(' . $row['Size_Product'] . ')';
-                if (strlen($textProduct) > 21) {
+                if (strlen($textProduct) > 43) {
                     $countLenghtTExt = $countLenghtTExt + 1;
                     $totalPanjanglengTExt =  $totalPanjanglengTExt + 1;
                 }
             }
-            $PanjangAwal = 103;
+            $PanjangAwal = 105;
             if ($countLenghtTExt > 0) {
                 $PanjangAwal = 105;
             }
@@ -1890,16 +1900,17 @@ class C_Transaction extends BaseController
             }
 
             if (count($resultDetailTrans) > 1) {
-                $tambahan = (5 * count($resultDetailTrans)) - 5;
+                $tambahan = (10 * count($resultDetailTrans)) - 10;
                 $PanjangAwal = $PanjangAwal + $tambahan;
             }
             if (count($resultPaymentTrans) > 1) {
-                $tambahan = (4 * count($resultPaymentTrans)) - 4;
+                $tambahan = (5 * count($resultPaymentTrans)) - 5;
                 $PanjangAwal = $PanjangAwal + $tambahan;
             }
 
-
-            $pdf = new\FPDF('P', 'mm', array(100, $PanjangAwal));
+            $setLine = 0.3;
+            // $pdf = new\FPDF('P', 'mm', array(100, $PanjangAwal));
+            $pdf = new\FPDF('P', 'mm', array(80, $PanjangAwal));
             $pdf->AddPage();
 
             $pdf->SetLeftMargin(5);
@@ -1912,17 +1923,17 @@ class C_Transaction extends BaseController
             $pdf->Cell(0, 2, 'Dukuh Kedawung Desa Sidorejo Gg Melati 3', 0, 1, 'C');
             $pdf->Cell(0, 5, 'Kec. Comal, Kabupaten Pemalang, 52363', 0, 1, 'C');
             $pdf->Cell(0, 3, 'WhatsApp : +6285865363125', 0, 1, 'C');
-            $pdf->SetLineWidth(0.1);
-            $pdf->Line(95, 32, 4, 32);
+            $pdf->SetLineWidth($setLine);
+            $pdf->Line(75, 32, 4, 32);
 
             //Sub Header
             $pdf->SetFont('Arial', '', 8);
-            $pdf->Cell(50, 13, 'Transaksi :' . $trans, 0, 0);
+            $pdf->Cell(45, 13, 'Transaksi :' . $trans, 0, 0);
             $pdf->Cell(0, 13, 'Pelanggan : ' . $resultTrans->NamaCustomer, 0, 1);
-            $pdf->Cell(50, -4, 'Tanggal : ' . date_format($date, "Y-m-d H:i"), 0, 0);
+            $pdf->Cell(45, -4, 'Tanggal : ' . date_format($date, "Y-m-d H:i"), 0, 0);
             $pdf->Cell(0, -4, 'Kasir : ' . $resultTrans->NamaKasir, 0, 1);
-            $pdf->SetLineWidth(0.1);
-            $pdf->Line(95, 45, 4, 45);
+            $pdf->SetLineWidth($setLine);
+            $pdf->Line(75, 45, 4, 45);
 
 
             //Value
@@ -1934,20 +1945,25 @@ class C_Transaction extends BaseController
 
                 $x = $pdf->GetX();
                 $y = $pdf->GetY();
-                if ($enterName == 1) {
-                    $y = $y + 5;
-                }
+                $yTmp = 5;
 
-                if ($lengtext > 21) {
-                    $y = $y + 5;
-                }
+                // if ($enterName == 1) {
+                //     $y = $y + 5;
+                // }
+
+                // if ($lengtext >= 20) {
+                //     $y = $y + 5;
+                // }
                 $pdf->SetXY($x, $y);
 
 
-                $textProduct = $row['Name_Product'] . '(' . $row['Size_Product'] . ')';
-                $pdf->MultiCell(35, 5, $textProduct, 0, 'L');
-                $lengtext = strlen($textProduct);
-                $pdf->SetXY($x + 32, $y);
+                $textProduct = trim(preg_replace('/\s\s+/', ' ', $row['Name_Product'] . '(' . $row['Size_Product'] . ')'));
+                $lengtext = strlen('Celana Tery Karet Std(S)1233424242425131334');
+                // if ($lengtext >= 20) {
+                //     $yTmp = 10;
+                // }
+                $pdf->MultiCell(0, 5, $textProduct, 0, 'L');
+                $pdf->SetXY($x, $y +  $yTmp);
                 $JumlahQTY = "";
                 if ($row['Unit_Product'] == "Potong") {
                     $JumlahQTY = ($row['Sum_Product_PerPiece'] / 1) . "PT";
@@ -1956,10 +1972,12 @@ class C_Transaction extends BaseController
                 } else  if ($row['Unit_Product'] == "Kodi") {
                     $JumlahQTY = ($row['Sum_Product_PerPiece'] / 20) . "KD";
                 }
-                $pdf->MultiCell(15, 5, $JumlahQTY, 0, "L");
-                $pdf->SetXY($x + 43, $y);
+                $pdf->MultiCell(10, 5, $JumlahQTY, 0, "L");
+                $pdf->SetXY($x + 10, $y +  $yTmp);
+                $pdf->MultiCell(10, 5, 'X', 0, "L");
+                $pdf->SetXY($x + 15, $y +  $yTmp);
                 $pdf->MultiCell(25, 5, number_format($row['Price_Product'], 0, ",", "."), 0, "L");
-                $pdf->SetXY($x + 65, $y);
+                $pdf->SetXY($x + 45, $y +  $yTmp);
                 $pdf->MultiCell(0, 5, number_format($row['Total_Payment'], 0, ",", "."), 0, "L");
                 $subTotalDraft = $subTotalDraft + $row['Total_Payment'];
                 // $enterName = 1;
@@ -1975,18 +1993,19 @@ class C_Transaction extends BaseController
                 $y = $pdf->GetY() + 3;
                 $spacesub = 7;
             }
-            $pdf->SetLineWidth(0.1);
-            $pdf->Line(45, $y + 3, 95, $y + 3);
+            $pdf->SetLineWidth($setLine);
+            $pdf->Line(26, $y + 3, 75, $y + 3);
             $y = $pdf->GetY();
-
+            $pdf->SetXY($x + 20, $y);
             $pdf->SetTextColor(0, 0, 0);
             $pdf->SetFont('Arial', '', 8);
-            $pdf->Cell(52, 13 + $spacesub, "Subtotal", 0, 0, "R");
-            $pdf->Cell(13, 13 + $spacesub, ":", 0, 0, "C");
+            $pdf->Cell(23, 13 + $spacesub, "Subtotal", 0, 0, "L");
+            $pdf->Cell(2, 13 + $spacesub, ":", 0, 0, "L");
             $pdf->Cell(0, 13 + $spacesub, number_format($resultTrans->Sub_Total, 0, ",", "."), 0, 1, "L");
 
-            $pdf->Cell(52, -5 - $spacesub, "Hutang", 0, 0, "R");
-            $pdf->Cell(13, -5 - $spacesub, ":", 0, 0, "C");
+            $pdf->SetX($x + 20);
+            $pdf->Cell(23, -5 - $spacesub, "Hutang", 0, 0, "L");
+            $pdf->Cell(2, -5 - $spacesub, ":", 0, 0, "L");
             $pdf->Cell(0, -5 - $spacesub, number_format($resultTrans->Total_Dept, 0, ",", "."), 0, 1, "L");
 
             $y = $pdf->GetY();
@@ -1994,12 +2013,13 @@ class C_Transaction extends BaseController
                 $y = $pdf->GetY() + 3;
                 $spacesub = 7;
             }
-            $pdf->SetLineWidth(0.1);
-            $pdf->Line(45, $y + 6, 95, $y + 6);
+            $pdf->SetLineWidth($setLine);
+            $pdf->Line(26, $y + 6, 75, $y + 6);
             $y = $pdf->GetY();
 
-            $pdf->Cell(52, 18 + $spacesub, "Total", 0, 0, "R");
-            $pdf->Cell(13, 18 + $spacesub, ":", 0, 0, "C");
+            $pdf->SetX($x + 20);
+            $pdf->Cell(23, 18 + $spacesub, "Total", 0, 0, "L");
+            $pdf->Cell(2, 18 + $spacesub, ":", 0, 0, "L");
             $pdf->Cell(0, 18 + $spacesub, number_format($resultTrans->Total_Payment, 0, ",", "."), 0, 1, "L");
 
 
@@ -2022,11 +2042,11 @@ class C_Transaction extends BaseController
                 }
                 $sisaPayment = $row['OverPay'];
                 $kembaliPayment = $row['ChangePay'];
-                $pdf->SetXY($x, $y);
-                $pdf->MultiCell(52, 5, $getText, 0, 'R');
-                $pdf->SetXY($x + 57, $y);
+                $pdf->SetXY($x + 20, $y);
+                $pdf->MultiCell(52, 5, $getText, 0, 'L');
+                $pdf->SetXY($x + 43, $y);
                 $pdf->MultiCell(13, 5, ':', 0, "L");
-                $pdf->SetXY($x + 65, $y);
+                $pdf->SetXY($x + 45, $y);
                 $pdf->MultiCell(0, 5, number_format($row['Payment'], 0, ",", "."), 0, "L");
                 $pdf->Ln(0);
                 $urutanBayar = $urutanBayar + 1;
@@ -2039,7 +2059,7 @@ class C_Transaction extends BaseController
             if ($resultTrans->StatusTransakksi == '4') {
                 $Status = 'Lunas';
                 if (count($resultPaymentTrans) > 1) {
-                    $textKembalian = 'Kembali Tahap ' . count($resultPaymentTrans);
+                    $textKembalian = 'Kembali Thp ' . count($resultPaymentTrans);
                     $hasilKembalianorsisa = $kembaliPayment;
                 } else {
                     $textKembalian = 'Kembali';
@@ -2056,8 +2076,9 @@ class C_Transaction extends BaseController
             }
 
             if ($resultTrans->StatusTransakksi != 2) {
-                $pdf->Cell(52, 5, $textKembalian, 0, 0, "R");
-                $pdf->Cell(13, 5, ":", 0, 0, "C");
+                $pdf->SetX($x + 20);
+                $pdf->Cell(23, 5, $textKembalian, 0, 0, "L");
+                $pdf->Cell(2, 5, ":", 0, 0, "L");
                 $pdf->Cell(0, 5, number_format($hasilKembalianorsisa, 0, ",", "."), 0, 1, "L");
             }
 
@@ -2067,16 +2088,16 @@ class C_Transaction extends BaseController
             $pdf->Cell(95, 5, "(*)Transaksi Status " . $Status, 0, 0, "L");
 
             $y = $pdf->GetY();
-            $pdf->SetLineWidth(0.1);
-            $pdf->Line(5, $y + 7, 95, $y + 7);
+            $pdf->SetLineWidth($setLine);
+            $pdf->Line(5, $y + 7, 75, $y + 7);
             // $pdf->Line(95, 42, 4, 42);
             $y = $pdf->GetY();
 
             $pdf->SetFont('Arial', '', 8);
-            $pdf->Cell(-95, 20, 'Terima Kasih Atas Kunjungan Anda', 0, 1, 'C');
+            $pdf->Cell(-118, 20, 'Terima Kasih Atas Kunjungan Anda', 0, 1, 'C');
             $y = $pdf->GetY();
-            $pdf->SetLineWidth(0.1);
-            $pdf->Line(5, $y - 6, 95, $y - 6);
+            $pdf->SetLineWidth($setLine);
+            $pdf->Line(5, $y - 6, 75, $y - 6);
             // // $pdf->SetX(25);
             // $pdf->Cell(18, -2, 'Bank Mandiri : 12345678 (Carudi) | Bank Mandiri : 12345678 (Carudi)', 0, 1, 'L');
             // // $pdf->Cell(2, -2, ':', 0, 0, 'L');
@@ -2096,7 +2117,7 @@ class C_Transaction extends BaseController
 
 
             $this->response->setHeader('Content-Type', 'application/pdf');
-            $pdf->Output("Nota-Pembayaran " . $trans . ".pdf", "I");
+            $pdf->Output("Nota-Pembayaran " . $trans . ".pdf", "D");
         }
     }
 
@@ -2140,7 +2161,7 @@ class C_Transaction extends BaseController
         $spreadsheet->getActiveSheet()->getStyle('A1:F1')->applyFromArray($styleHeader);
         $count = 2;
         $Total = 0;
-        // for ($i = 0; $i < 10; $i++) {
+        // for ($i = 0; $i <- 10; $i++) {
         foreach ($datas as $row) {
             $metode = 'Tunai';
             if ($row['Image']) {
@@ -2218,4 +2239,315 @@ class C_Transaction extends BaseController
         $guid = join('-', $phash);
         return $guid;
     }
+
+    public function testDummy()
+    {
+        $str = "  1.000.000LS X 10.000.000        1.000.000.000";
+        $temp = '';
+        for ($i = 1; $i <= strlen($str); $i++) {
+            if ($i < 2) {
+                $temp = $temp . '' . $str[$i];
+            }
+        }
+        echo strlen('1.000.000.000');
+    }
+    public function cb()
+    {
+        $connector = new WindowsPrintConnector("POS88");
+        $printer = new Printer($connector);
+
+        // $printer->text("Celana Tery Karet Std\n");
+        // $printer->setJustification(2);
+        $marginText = "  ";
+        // total range 1 - 13
+        //Space range 14 - 23
+        //harga range 24 - 34
+        //Space range 35
+        // X range 36
+        //Space range 37
+        //Jumlah range 38 - 49
+        // marginText 50-51
+
+        // $printer->text($marginText . "1.000.000LS X 10.000.000         1.000.000.000");
+        // $printer->text($marginText . "100LS X 10.000        1.000.000");
+        $sisaAll = 0;
+        $kuota = [
+            2, //Margin
+            11, //Jumlah
+            1, //spasi
+            1, // Huruh X
+            1, //Spasi
+            10, //Harga
+            9, //Spasi,
+            13, //Total
+        ];
+
+        // $jumlah = "200LS";
+        // $harga = "100.000";
+        // $total = '20.000.000';
+
+        // $spaceTotal = $this->generateSpace(9);
+
+        // $createText = $marginText . $jumlah . " X " . $harga . $spaceTotal . $total;
+        // if (strlen($createText) < 51) {
+        //     $spaceTotal = $this->generateSpace(9 + (51 - strlen($createText) - 3));
+        // }
+
+        // $createText = $marginText . $jumlah . " X " . $harga . $spaceTotal . $total;
+        // // $printer->text($marginText . $this->generateKolom('20LS', 11) . " X " . $this->generateKolom('10.000', 10) . $spaceTotal . $this->generateKolom($total, 13));
+        // $printer->text((($createText)));
+
+        $printer->setJustification(2);
+        $spaceSPace = $this->generateSpace(6);
+        $subtotal = '1.000.000';
+        if (strlen($subtotal) < 13) {
+            $spaceSPace = $this->generateSpace(6 + (13 - strlen($subtotal)));
+        }
+        // 
+        $printer->text("SubTotal      1.000.000.000\n");
+        $printer->text('Kembalian Thp 2' . $spaceSPace . '1.000.000');
+
+        $printer->feed('2');
+        // $printer->cut();
+
+        /* Close printer */
+        $printer->close();
+    }
+
+    public function generateKolom($text, $max)
+    {
+        $temp = '';
+        for ($i = 0; $i < $max - strlen($text); $i++) {
+            $temp = $temp . ' ';
+        }
+        $text =   $text . $temp;
+        return $text;
+    }
+    public function generateSpace($max)
+    {
+        $temp = '';
+        for ($i = 0; $i < $max; $i++) {
+            $temp = $temp . ' ';
+        }
+        return $temp;
+    }
+    public function printCetakNow($trans)
+    {
+        $whereTrans = [
+            'Number_Trans' => $trans
+        ];
+        $resultTrans = $this->T_TransaksiManual->getTrans($whereTrans, 'ASC')->getRow();
+        $date = date_create($resultTrans->CreatedDate);
+
+        $whereDetailTrans = [
+            'Id_Transaction' => $resultTrans->Id
+        ];
+        $resultDetailTrans = $this->T_DetailTransactionManual->getData($whereDetailTrans)->getResult('array');
+        $wherePaymentTrans = [
+            'Id_Transaction' => $resultTrans->Id,
+            'TypeTransaction' => 16
+        ];
+        $resultPaymentTrans = $this->M_ActivityTransaction->getData($wherePaymentTrans)->getResult('array');
+
+        if ($resultTrans->StatusTransakksi == 2) {
+            $resultDetailTrans = $this->setCartDraftPrint($whereDetailTrans);
+        }
+
+        $connector = new WindowsPrintConnector("POS88");
+        $printer = new Printer($connector);
+
+
+        $esc = '0x1B'; //ESC byte in hex notation
+        $newLine = '0x0A'; //LF byte in hex notation
+        $printer->setJustification(1);
+        $printer->setTextSize(2, 2);
+        $printer->text("Konveksi R-3\n");
+        $printer->setTextSize(1, 1);
+        $printer->text("Dukuh Kedawung Desa Sidorejo Gg Melati 3\n");
+        $printer->text("Kec. Comal, Kabupaten Pemalang, 52363\n");
+        $printer->text("WhatsApp : +6285865363125\n");
+        $printer->textRaw(str_repeat(chr(196), 45) . PHP_EOL);
+        $printer->setJustification(1);
+        $printer->text($trans . "--" . $resultTrans->usernamekasir . "--" . date_format($date, "Y-m-d H:i") . "\n");
+        $printer->setJustification(1);
+        $printer->text("Pelanggan :" . $resultTrans->NamaCustomer . " \n");
+        $printer->setJustification(1);
+        $printer->textRaw(str_repeat(chr(196), 45) . PHP_EOL);
+        $no = 1;
+        $subTotalDraft = 0;
+        foreach ($resultDetailTrans as $row) {
+            $textProduct = trim(preg_replace('/\s\s+/', ' ', $row['Name_Product'] . '(' . $row['Size_Product'] . ')'));
+            $printer->setJustification(0);
+            $printer->text($no . "." . $textProduct . "\n");
+            $JumlahQTY = "";
+            if ($row['Unit_Product'] == "Potong") {
+                $JumlahQTY = ($row['Sum_Product_PerPiece'] / 1) . "PT";
+            } else  if ($row['Unit_Product'] == "Lusin") {
+                $JumlahQTY = ($row['Sum_Product_PerPiece'] / 12) . "LS";
+            } else  if ($row['Unit_Product'] == "Kodi") {
+                $JumlahQTY = ($row['Sum_Product_PerPiece'] / 20) . "KD";
+            }
+
+            $printer->setJustification(2);
+            $jumlah = "200LS";
+            $harga = number_format($row['Price_Product'], 0, ",", ".");
+            $total = number_format($row['Total_Payment'], 0, ",", ".");
+            $marginText = "  ";
+            $spaceTotal = $this->generateSpace(9);
+
+            $createText = $marginText . $JumlahQTY . " X " . $harga . $spaceTotal . $total;
+            if (strlen($createText) < 51) {
+                $spaceTotal = $this->generateSpace(9 + (51 - strlen($createText) - 3));
+            }
+
+            $createText = $marginText . $JumlahQTY . " X " . $harga . $spaceTotal . $total;
+            // $printer->text($marginText . $this->generateKolom('20LS', 11) . " X " . $this->generateKolom('10.000', 10) . $spaceTotal . $this->generateKolom($total, 13));
+            $printer->text($createText . "\n");
+
+            $subTotalDraft = $subTotalDraft + $row['Total_Payment'];
+            // $printer->text($spaciawal . $JumlahQTY . $spasiKolom1 . "X" . $spasiKolom2 . number_format($row['Price_Product'], 0, ",", ".") . $spasiKolom3 . number_format($row['Total_Payment'], 0, ",", ".") . "\n");
+            $no++;
+        }
+
+        $spaceaftervalue = "";
+        for ($i = 0; $i < 20; $i++) {
+            $spaceaftervalue = $spaceaftervalue . ' ';
+        }
+        $templine = "";
+        for ($i = 0; $i < 26; $i++) {
+            $templine = $templine . '-';
+        }
+        $printer->text($spaceaftervalue . $templine . "\n");
+
+        //Sub total Start
+        $printer->setJustification(2);
+        $spaceSPace = $this->generateSpace(6);
+        $value =  number_format($resultTrans->Sub_Total, 0, ",", ".");
+        if (strlen($value) < 13) {
+            $spaceSPace = $this->generateSpace(6 + (13 - strlen($value)));
+        }
+        // 
+        $printer->text("SubTotal" . $spaceSPace . $value . "\n");
+        // $printer->text($kolomValueSubtotal . number_format($resultTrans->Sub_Total, 0, ",", ".") . "\n");
+        //Sub total End
+
+        //Hutang Start
+
+        $printer->setJustification(2);
+        $spaceSPace = $this->generateSpace(6);
+        $value = number_format($resultTrans->Total_Dept, 0, ",", ".");
+        if (strlen($value) < 13) {
+            $spaceSPace = $this->generateSpace(6 + (13 - strlen($value)));
+        }
+        // 
+        $printer->text("Hutang" . $spaceSPace . $value . "\n");
+        //Hutang End
+
+        $printer->text($spaceaftervalue . $templine . "\n");
+
+        //Total Start
+
+        $printer->setJustification(2);
+        $spaceSPace = $this->generateSpace(6);
+        $value = number_format($resultTrans->Total_Payment, 0, ",", ".");
+        if (strlen($value) < 13) {
+            $spaceSPace = $this->generateSpace(6 + (13 - strlen($value)));
+        }
+        $printer->text("Total" . $spaceSPace . $value . "\n");
+        //Total End
+
+        //Bayar Start
+
+        $urutanBayar = 1;
+        foreach ($resultPaymentTrans as $row) {
+
+            $getText = 'Bayar ' . $urutanBayar;
+            if (count($resultPaymentTrans) == 1) {
+                $getText = 'Bayar';
+            }
+            $sisaPayment = $row['OverPay'];
+            $kembaliPayment = $row['ChangePay'];
+
+
+            $printer->setJustification(2);
+            $spaceSPace = $this->generateSpace(6);
+            $value = number_format($row['Payment'], 0, ",", ".");
+            if (strlen($value) < 13) {
+                $spaceSPace = $this->generateSpace(6 + (13 - strlen($value)));
+            }
+            $printer->text($getText . $spaceSPace . $value . "\n");
+
+            $urutanBayar = $urutanBayar + 1;
+        }
+        //Bayar End
+
+        //Kembalian Start
+        $Status = 'Draft';
+        $hasilKembalianorsisa = 0;
+        $textKembalian = 'Kembali';
+        if ($resultTrans->StatusTransakksi == '4') {
+            $Status = 'Lunas';
+            if (count($resultPaymentTrans) > 1) {
+                $textKembalian = 'Kembali';
+                $hasilKembalianorsisa = $kembaliPayment;
+            } else {
+                $textKembalian = 'Kembali';
+                $hasilKembalianorsisa = $kembaliPayment;
+            }
+        } else if ($resultTrans->StatusTransakksi == '5') {
+            $Status = 'Belum Lunas';
+            $textKembalian = 'Sisa';
+            $hasilKembalianorsisa = $sisaPayment;
+        } else if ($resultTrans->StatusTransakksi == '6') {
+            $textKembalian = 'Sisa';
+            $hasilKembalianorsisa = $sisaPayment;
+            $Status = 'Diteruskan';
+        }
+
+        if ($resultTrans->StatusTransakksi != 2) {
+
+
+            $printer->setJustification(2);
+            $spaceSPace = $this->generateSpace(6);
+            $value =  number_format($hasilKembalianorsisa, 0, ",", ".");
+            if (strlen($value) < 13) {
+                $spaceSPace = $this->generateSpace(6 + (13 - strlen($value)));
+            }
+            $printer->text($textKembalian . $spaceSPace . $value . "\n");
+        }
+        $printer->setJustification(0);
+        $printer->text("\n" . "(*)Transaksi Status " . $Status . "\n");
+
+        //Kembalian End
+
+        $printer->textRaw(str_repeat(chr(196), 45) . PHP_EOL);
+        $printer->setJustification(1);
+        $printer->text("Terima Kasih Atas Kunjungan Anda\n");
+        $printer->setJustification(0);
+        $printer->textRaw(str_repeat(chr(196), 45) . PHP_EOL);
+
+        // $printer->textRaw(str_repeat(chr(196), 45) . PHP_EOL);
+
+        // $printer->text(" Pelanggan : " . $trans);
+        // $printer->text("Aku Dalah Manusial!");
+        $printer->feed('2');
+        // $printer->cut();
+
+        /* Close printer */
+        $printer->close();
+
+        // $names = CapabilityProfile::class;
+        // echo json_encode($names::load('simple'));
+
+        // $connector = new WindowsPrintConnector("Canon");
+    }
+    public function Create2Column($value1, $value2) {}
+
+    // public function testP()
+    // {
+    //     $connector = new WindowsPrintConnector("POS88");
+    //     $printer = new Printer($connector);
+    //     $printer->close();
+    //     echo json_encode($printer->getPrintConnector());
+    // }
 }

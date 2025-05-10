@@ -453,8 +453,8 @@ class C_Product extends BaseController
                         'Per_Piece' => $this->request->getVar('Potong'),
                         'Per_Doze' => $this->request->getVar('Lusin'),
                         'Per_Kodi' => $this->request->getVar('Kodi'),
-                        // 'Stock' => $this->request->getVar('Stok'),
-                        // 'TypeStock' => $this->request->getVar('typeStok'),
+                        'Stock' => $this->request->getVar('Stok'),
+                        'TypeStock' => $this->request->getVar('typeStok'),
                         'ModifiedBy' => session()->get('Username')
                     ];
                 } else if ($this->request->getVar('IsFoto') == 2) {
@@ -470,8 +470,8 @@ class C_Product extends BaseController
                         'Per_Piece' => $this->request->getVar('Potong'),
                         'Per_Doze' => $this->request->getVar('Lusin'),
                         'Per_Kodi' => $this->request->getVar('Kodi'),
-                        // 'Stock' => $this->request->getVar('Stok'),
-                        // 'TypeStock' => $this->request->getVar('typeStok'),
+                        'Stock' => $this->request->getVar('Stok'),
+                        'TypeStock' => $this->request->getVar('typeStok'),
                         'ModifiedBy' => session()->get('Username')
                     ];
                 } else {
@@ -488,8 +488,8 @@ class C_Product extends BaseController
                         'Per_Piece' => $this->request->getVar('Potong'),
                         'Per_Doze' => $this->request->getVar('Lusin'),
                         'Per_Kodi' => $this->request->getVar('Kodi'),
-                        // 'Stock' => $this->request->getVar('Stok'),
-                        // 'TypeStock' => $this->request->getVar('typeStok'),
+                        'Stock' => $this->request->getVar('Stok'),
+                        'TypeStock' => $this->request->getVar('typeStok'),
                         'ModifiedBy' => session()->get('Username')
                     ];
                 }

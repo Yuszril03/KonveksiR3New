@@ -322,6 +322,7 @@ function setDataCustomFrom (id) {
     url: linkUrl + 'C_Product/getOneCustomPrice/' + id,
     dataType: 'JSON'
   }).done(result => {
+    // console.log(result)
     document.getElementById('Name').value = result.Name
     document.getElementById('tempName').value = result.Name
     document.getElementById('Potong').value = formatRupiah(

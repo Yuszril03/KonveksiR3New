@@ -137,7 +137,7 @@ function setData () {
       document.getElementById('gender').innerHTML = '-'
     } else {
       document.getElementById('gender').innerHTML =
-        Pelanggan.Gender == '0' ? 'Perempuan' : 'Laki-Laki'
+        Pelanggan.Gender == '0  ' ? 'Perempuan' : 'Laki-Laki'
     }
 
     document.getElementById('telepon').innerHTML = Pelanggan.Telephone

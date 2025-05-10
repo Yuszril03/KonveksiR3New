@@ -85,18 +85,18 @@ class C_Employee extends BaseController
 
         // 2. Get Data Log
         $EndDate = date('Y-m-d');
-        $EndDate = date('Y-m-d', strtotime($EndDate . ' +1 day'));
         $StartDate = date('Y-m-d', strtotime($EndDate . ' -8 day'));
         $whereDataLog = "Username = '" . $resultDataUser->Username . "' AND CreatedDate >= '" . $StartDate . "' AND CreatedDate <= '" . $EndDate . "'";
         $resultLog = $this->M_ActivityEmployee->getDataLog($whereDataLog, 'DESC')->getResult('array');
 
         // 3. Get Bawahan
         $resultDataBawahan = array();
-        // $whereDataBAwahan = "1=1";
-        $whereDataBAwahan = " Superior = '" . $resultDataUser->Username . "'";
+        $whereDataBAwahan = "1=1";
         if ((int)$resultDataUser->IdPosition == 1) {
-            $whereDataBAwahan = "1=1 AND Username <> '".$resultDataUser->Username."'";
-        } 
+            $whereDataBAwahan = $whereDataBAwahan . " AND IdPosition <> 1";
+        } else if ((int)$resultDataUser->IdPosition == 3) {
+            $whereDataBAwahan = $whereDataBAwahan .  " AND Superior = '" . $resultDataUser->Username . "'";
+        }
 
         $resultDataBawahan = $this->M_Employee->getData($whereDataBAwahan)->getResult('array');
 
