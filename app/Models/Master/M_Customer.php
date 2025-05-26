@@ -56,7 +56,7 @@ class M_Customer extends Model
 
     public function SaveDateCustom($data)
     {
-        $result = $this->orderBy('Id', 'DESC')->get()->getRow();
+        $result = $this->orderBy('CreatedDate', 'DESC')->get()->getRow();
         if ($result == null) {
             $data['Id'] = 'C-1';
             $hasil = $this->insert($data);

@@ -596,11 +596,21 @@ function sendToPayment (formData) {
   })
 }
 
+// document.getElementById('cetakNota').addEventListener('click', function () {
+//   let kode = NoTranss
+//   window.open(`${linkUrl}/Nota-Transaksi/${kode}`, '_blank')
+// })
 document.getElementById('cetakNota').addEventListener('click', function () {
+  let kode = NoTranss
+  $.ajax({
+    url:linkUrl+"C_Transaction/printCetakNow/"+kode,
+    method:"GET"
+  })
+})
+document.getElementById('download').addEventListener('click', function () {
   let kode = NoTranss
   window.open(`${linkUrl}/Nota-Transaksi/${kode}`, '_blank')
 })
-
 document.getElementById('prevRiwayat').addEventListener('click', function () {
   window.location.href = linkUrl + 'Riwayat-Transaksi'
 })

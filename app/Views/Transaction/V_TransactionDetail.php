@@ -173,6 +173,7 @@
                                                         <h4 class="mt-4">Pembayaran Berhasil</h4>
                                                         <p>Pembayaran sudah dilakukan</p>
                                                         <button id="cetakNota" class="btn btn-secondary">Cetak Nota</button>
+                                                        <button id="download" class="btn btn-danger">Download Nota</button>
                                                         <button id="prevRiwayat" class="btn btn-primary">Kembali Menu Riwayat</button>
                                                     </center>
                                                 </div>
