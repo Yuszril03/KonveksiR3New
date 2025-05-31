@@ -2420,6 +2420,10 @@ class C_Transaction extends BaseController
         $printer->text($spaceaftervalue . $templine . "\n");
 
         //Sub total Start
+        if ($resultTrans->StatusTransakksi == '2'){
+            $resultTrans->Sub_Total = $subTotalDraft;
+            $resultTrans->Total_Payment = $subTotalDraft + $resultTrans->Total_Dept;
+         }
         $printer->setJustification(2);
         $spaceSPace = $this->generateSpace(6);
         $value =  number_format($resultTrans->Sub_Total, 0, ",", ".");
@@ -2427,6 +2431,7 @@ class C_Transaction extends BaseController
             $spaceSPace = $this->generateSpace(6 + (13 - strlen($value)));
         }
         // 
+         
         $printer->text("SubTotal" . $spaceSPace . $value . "\n");
         // $printer->text($kolomValueSubtotal . number_format($resultTrans->Sub_Total, 0, ",", ".") . "\n");
         //Sub total End
